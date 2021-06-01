@@ -4,8 +4,8 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 
-float VerticalCalZ = 0.52;
-float FortyFiveCalZ = -6.6;
+float VerticalCalZ = 0.90;
+float FortyFiveCalZ = -6.2;
 float theta;
 float accZ;
 
@@ -98,8 +98,8 @@ void loop() {
 
   accZ = a.acceleration.z;
   theta = map(10000*accZ, 10000*FortyFiveCalZ, 10000*VerticalCalZ, 45.0, 0.0);
-//  Serial.print(accZ);
-//  Serial.print(", ");
+  Serial.print(accZ);
+  Serial.print(", ");
   Serial.println(theta);
 
   delay(100);

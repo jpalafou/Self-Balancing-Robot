@@ -10,16 +10,16 @@ Servo Lservo;
 Servo Rservo;
 
 // angle read variales
-float VerticalCalZ = 0.52;
-float FortyFiveCalZ = -6.6;
+float VerticalCalZ = 0.90;
+float FortyFiveCalZ = -6.2;
 float theta;
 float theta_dot;
 float accZ;
 
 // control variables
-float theta_stable = 5.0; // -6.0; // theta where the robot is balanced
-float P = 5.0; // control gain (proportional)
-float D = 0.0; // control gain (derivative)
+float theta_stable = 7.0; // -6.0; // theta where the robot is balanced
+float P = 3.0; // control gain (proportional)
+float D = 1.0; // control gain (derivative)
 
 // servo write variables
 int LservoPin = 3;       // Pin that the left servomotor is connected to
