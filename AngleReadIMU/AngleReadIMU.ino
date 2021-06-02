@@ -96,7 +96,7 @@ void loop() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  accZ = a.acceleration.z;
+  accZ = a.acceleration.y;
   
   theta = map(10000*accZ, 10000*FortyFiveCalZ, 10000*VerticalCalZ, 45.0, 0.0);
   Serial.print(accZ);

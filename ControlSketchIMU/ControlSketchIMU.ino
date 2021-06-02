@@ -19,12 +19,12 @@ float accZ;
 
 // control variables
 float theta_stable = 3.0; // -7.0; // theta where the robot is balanced
-float P = 5.0; // 20.0; // control gain (proportional)
-float D = 5.0; //  5.0; // control gain (derivative)
+float P = 10.0; // 20.0; // control gain (proportional)
+float D = 00.0; //  5.0; // control gain (derivative)
 
 float theta_history[50];
 float theta_dot_history[50];
-int hist = 50; // number of samples to keep for the mean
+int hist = 30; // number of samples to keep for the mean
 int up = 0; // index to place new recording
 
 // servo write variables
