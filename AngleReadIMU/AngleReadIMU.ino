@@ -97,6 +97,7 @@ void loop() {
   mpu.getEvent(&a, &g, &temp);
 
   accZ = a.acceleration.z;
+  
   theta = map(10000*accZ, 10000*FortyFiveCalZ, 10000*VerticalCalZ, 45.0, 0.0);
   Serial.print(accZ);
   Serial.print(", ");
