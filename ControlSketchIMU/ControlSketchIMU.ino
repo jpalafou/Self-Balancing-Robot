@@ -16,11 +16,12 @@ float ThetaDotCal = -2.10;
 float theta;
 float theta_dot;
 float accZ;
+float theta_0 = 0.0; // initial theta reading
 
 // control variables
 float theta_stable = 3.0; // -7.0; // theta where the robot is balanced
-float P = 10.0; // 20.0; // control gain (proportional)
-float D = 00.0; //  5.0; // control gain (derivative)
+float P = 0.0; // 20.0; // control gain (proportional)
+float D = 0.0; //  5.0; // control gain (derivative)
 
 float theta_history[50];
 float theta_dot_history[50];
@@ -31,6 +32,10 @@ int up = 0; // index to place new recording
 int LservoPin = 3;       // Pin that the left servomotor is connected to
 int RservoPin = 6;       // Pin that the right servomotor is connected to
 float phi;          // angle to send to servo
+
+// time variables
+float deltaT;
+float oldTime = 0.0; // old time reading
 
 void setup(void) {
   Serial.begin(115200);
@@ -113,16 +118,36 @@ void setup(void) {
 
   Serial.println("");
   delay(100);
+
+  // ENTERING CALIBRATION
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
+
+  // initialize sensor
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  for (int j = 0; j < hist; j = j + 1) {
+    accZ = a.acceleration.z;
+    
+    theta_0 += float_map(accZ, FortyFiveCalZ, VerticalCalZ, 45.0, 0.0);
+  }
+
+  theta_0 = theta_0/float(hist);
+  
+  digitalWrite(13, LOW); // ending calibration
 }
 
 void loop() {
+  // calculate delta t
+  deltaT = CalculateDeltaTime()/1000.0;
 
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
   // find current theta_dot
-  theta_dot = 180*g.gyro.x/3.14159;
+  theta_dot = g.gyro.x;
   theta_dot -= ThetaDotCal;
 
   // update theta dot history
@@ -135,7 +160,7 @@ void loop() {
   accZ = a.acceleration.z;
   
   // map accZ to an angle
-  theta_history[up] = map(10000*accZ, 10000*FortyFiveCalZ, 10000*VerticalCalZ, 45.0, 0.0);
+  theta_history[up] = float_map(accZ, FortyFiveCalZ, VerticalCalZ, 45.0, 0.0);
 
   // find moving average of theta
   theta = AverageArray(theta_history);
