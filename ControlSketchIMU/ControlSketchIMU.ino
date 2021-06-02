@@ -12,16 +12,17 @@ Servo Rservo;
 // angle read variales
 float VerticalCalZ = 0.90;
 float FortyFiveCalZ = -6.2;
-float ThetaDotCal = -2.10;
 float theta;
 float theta_dot;
 float accZ;
-float theta_0 = 0.0; // initial theta reading
+float theta_0 = 5.0; // initial theta reading
+float theta_dot_0 = 0.0; // initial theta reading
+int CalInt = 10000; // integer for calibration
 
 // control variables
 float theta_stable = 3.0; // -7.0; // theta where the robot is balanced
-float P = 0.0; // 20.0; // control gain (proportional)
-float D = 0.0; //  5.0; // control gain (derivative)
+float P = 20.0; // 20.0; // control gain (proportional)
+float D = 1.0; //  5.0; // control gain (derivative)
 
 float theta_history[50];
 float theta_dot_history[50];
@@ -120,6 +121,7 @@ void setup(void) {
   delay(100);
 
   // ENTERING CALIBRATION
+  Serial.println("Calibrating ...");
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
 
@@ -127,15 +129,22 @@ void setup(void) {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  for (int j = 0; j < hist; j = j + 1) {
+  for (int j = 0; j < CalInt; j = j + 1) {
     accZ = a.acceleration.z;
     
     theta_0 += float_map(accZ, FortyFiveCalZ, VerticalCalZ, 45.0, 0.0);
+    theta_dot_0 += g.gyro.x;
   }
 
-  theta_0 = theta_0/float(hist);
+  theta_0 = theta_0/float(CalInt);
+  theta = theta_0;
+
+  theta_dot_0 = theta_dot_0/float(CalInt);
   
   digitalWrite(13, LOW); // ending calibration
+  Serial.println("Done calibrating !");
+  Serial.println("Waiting ...");
+  delay(3000);
 }
 
 void loop() {
@@ -147,8 +156,7 @@ void loop() {
   mpu.getEvent(&a, &g, &temp);
 
   // find current theta_dot
-  theta_dot = g.gyro.x;
-  theta_dot -= ThetaDotCal;
+  theta_dot = 180*(g.gyro.x - theta_dot_0)/3.14159;
 
   // update theta dot history
   theta_dot_history[up] = theta_dot;
@@ -158,12 +166,9 @@ void loop() {
 
   // find current accZ
   accZ = a.acceleration.z;
-  
-  // map accZ to an angle
-  theta_history[up] = float_map(accZ, FortyFiveCalZ, VerticalCalZ, 45.0, 0.0);
 
-  // find moving average of theta
-  theta = AverageArray(theta_history);
+  // find theta
+  theta += theta_dot*deltaT; 
   
   // print results
   printData();

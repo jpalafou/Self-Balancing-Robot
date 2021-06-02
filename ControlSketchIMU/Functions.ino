@@ -5,6 +5,8 @@ void printData() {
   Serial.print(", ");
   Serial.print(theta);
   Serial.print(", ");
+  Serial.print(theta_dot_0);
+  Serial.print(", ");
   Serial.println(theta_dot);
 }
 
