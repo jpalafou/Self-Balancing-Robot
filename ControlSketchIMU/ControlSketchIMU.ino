@@ -12,20 +12,14 @@ Servo Rservo;
 // angle read variales
 float VerticalCalZ = 0.90;
 float FortyFiveCalZ = -6.2;
-float ThetaDotCal = -2.10;
 float theta;
 float theta_dot;
 float accZ;
 
 // control variables
-float theta_stable = 3.0; // -7.0; // theta where the robot is balanced
-float P = 5.0; // 20.0; // control gain (proportional)
-float D = 5.0; //  5.0; // control gain (derivative)
-
-float theta_history[50];
-float theta_dot_history[50];
-int hist = 50; // number of samples to keep for the mean
-int up = 0; // index to place new recording
+float theta_stable = 7.0; // -6.0; // theta where the robot is balanced
+float P = 3.0; // control gain (proportional)
+float D = 1.0; // control gain (derivative)
 
 // servo write variables
 int LservoPin = 3;       // Pin that the left servomotor is connected to
@@ -121,41 +115,17 @@ void loop() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  // find current theta_dot
   theta_dot = 180*g.gyro.x/3.14159;
-  theta_dot -= ThetaDotCal;
-
-  // update theta dot history
-  theta_dot_history[up] = theta_dot;
-
-  // find moving average
-  theta_dot = AverageArray(theta_dot_history);
-
-  // find current accZ
   accZ = a.acceleration.z;
-  
-  // map accZ to an angle
-  theta_history[up] = map(10000*accZ, 10000*FortyFiveCalZ, 10000*VerticalCalZ, 45.0, 0.0);
+  theta = map(10000*accZ, 10000*FortyFiveCalZ, 10000*VerticalCalZ, 45.0, 0.0);
+//  Serial.print(accZ);
+//  Serial.print(", ");
+//  Serial.println(theta);
 
-  // find moving average of theta
-  theta = AverageArray(theta_history);
-  
-  // print results
-  printData();
-
-  // create response command
   phi = ( P*(theta - theta_stable) ) + ( D*theta_dot );
 
   // send this to servo
   Rservo.writeMicroseconds(1500-phi);
   Lservo.writeMicroseconds(1500+phi);
-
-  // update index
-  if (up == hist - 1) {
-    up = 0;
-  }
-  else {
-    up += 1;
-  }
   
 }
