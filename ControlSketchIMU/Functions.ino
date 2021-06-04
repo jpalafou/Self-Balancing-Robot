@@ -1,4 +1,6 @@
 void printData() {
+  Serial.print(millis()/float(1000));
+  Serial.print(", ");
   Serial.print(deltaT, 4);
   Serial.print(", ");
   Serial.print(theta_0);
@@ -7,7 +9,9 @@ void printData() {
   Serial.print(", ");
   Serial.print(theta_dot_0);
   Serial.print(", ");
-  Serial.println(theta_dot);
+  Serial.print(theta_dot);
+  Serial.print(", ");
+  Serial.println(phi);
 }
 
 float AverageArray(float Array[50]) {

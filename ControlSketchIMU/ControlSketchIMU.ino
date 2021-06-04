@@ -20,9 +20,9 @@ float theta_dot_0 = 0.0; // initial theta reading
 int CalInt = 10000; // integer for calibration
 
 // control variables
-float theta_stable = 3.0; // -7.0; // theta where the robot is balanced
+float theta_stable = 3.5; // -7.0; // theta where the robot is balanced
 float P = 20.0; // 20.0; // control gain (proportional)
-float D = 1.0; //  5.0; // control gain (derivative)
+float D = 3.0; //  5.0; // control gain (derivative)
 
 float theta_history[50];
 float theta_dot_history[50];
